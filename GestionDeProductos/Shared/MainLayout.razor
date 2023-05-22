@@ -1,0 +1,38 @@
+﻿@inherits LayoutComponentBase
+
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4 auth">
+            <LoginDisplay />
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            <AuthorizeView>
+                <NotAuthorized>
+                    @if (context.User.Identity?.IsAuthenticated != true)
+                    {
+                        <p role="alert">Necesitas logearte antes de acceder a esta pagina.</p>
+                        <div style="display:none">@Body</div>
+                    }
+                    else
+                    {
+                        <p role="alert">You are not authorized to access this resource.</p>
+                        <div style="display:none">@Body</div>
+                    }
+                </NotAuthorized>
+                <Authorized>
+                    @Body
+                </Authorized>
+            </AuthorizeView>
+
+        </article>
+    </main>
+</div>
+
+
