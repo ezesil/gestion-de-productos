@@ -8,7 +8,7 @@
         "kc_address": "https://kc.ezedev.io/auth/realms/GestionProductos/.well-known/openid-configuration",
         "kc_authority": "https://kc.ezedev.io/auth/realms/GestionProductos",
         "kc_audience": "account",
-        "mssql_connstring": "p"
+        "mssql_connstring": "Server=sqlserver.ezedev.io;Database=GestionDeProductos;Uid=sa;Pwd=Contraseñadesuperadmin33;"
       },
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "https://localhost:4200",

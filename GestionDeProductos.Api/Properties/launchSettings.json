@@ -15,7 +15,11 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "kc_address": "https://kc.ezedev.io/auth/realms/GestionProductos/.well-known/openid-configuration",
+        "kc_authority": "https://kc.ezedev.io/auth/realms/GestionProductos",
+        "kc_audience": "account",
+        "mssql_connstring": "Server=sqlserver.ezedev.io;Database=GestionDeProductos;Uid=sa;Pwd=Contraseñadesuperadmin33;"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7052;http://localhost:5225"

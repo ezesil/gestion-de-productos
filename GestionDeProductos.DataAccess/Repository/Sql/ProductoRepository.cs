@@ -11,19 +11,8 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
     /// <summary>
     /// Repositorio de sesiones.
     /// </summary>
-    public class ProductoRepository : SqlRepository<Producto>, IGenericRepository<Producto>
+    public class ProductoRepository : SqlRepository, IGenericRepository<Producto>
     {    
-        public override string DeleteQuery
-        { get => "DELETE FROM [CinemaDB].[dbo].[Sesion] where [guid_sesion] = @Id"; }
-        public override string SelectAllQuery
-        { get => "SELECT [guid_sesion],[fecha],[guid_pelicula],[guid_sala] FROM [CinemaDB].[dbo].[Sesiones]"; }
-        public override string SelectQuery
-        { get => "SELECT [guid_sesion],[fecha],[guid_pelicula],[guid_sala] FROM [CinemaDB].[dbo].[Sesiones] where [guid_sesion] = @Id"; }
-        public override string InsertQuery
-        { get => "INSERT INTO [CinemaDB].[dbo].[Sesiones] ([guid_sesion],[fecha],[guid_pelicula],[guid_sala]) values (@Id, @Date, @MovieId, @RoomId)"; }
-        public override string UpdateQuery
-        { get => "UPDATE [CinemaDB].[dbo].[Sesiones] SET [fecha] = @Date,[guid_pelicula] = @MovieId,[guid_sala] = @RoomId where [guid_sesion] = @Id"; }
-
         /// <summary>
         /// Constructor por defecto sin parametros.
         /// </summary>
@@ -31,30 +20,39 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
         { 
         }
 
+        #region Producto
+        public async Task<IEnumerable<Producto>> GetAll()
+        {
+            var query = "SELECT [IdProducto], [Nombre], [Descripcion], [Precio] FROM [dbo].[Producto]";
+            return await QueryMultiple<Producto>(query);
+        }
+
         public async Task Insert(Producto obj)
         {
-            await base.Insert(obj);
+            var query = "INSERT INTO [dbo].[Producto] ([IdProducto], [Nombre], [Descripcion], [Precio]) VALUES (@IdProducto, @Nombre, @Descripcion, @Precio)";
+            await Query(query, obj);
         }
 
         public async Task Update(Producto obj)
         {
-            await base.Update(obj);
+            var query = "UPDATE [dbo].[Producto] SET [Nombre] = @Nombre, [Descripcion] = @Descripcion, [Precio] = @Precio WHERE [IdProducto] = @IdProducto";
+            await Query(query, obj);
         }
 
-        public async Task<IEnumerable<Producto>> GetAll()
+        public async Task Delete(int idProducto)
         {
-            return await base.GetAll();
+            var query = "DELETE FROM [dbo].[Producto] WHERE [IdProducto] = @IdProducto";
+            await Query(query, new { idProducto });
         }
 
-        public async Task<Producto> GetOne(Guid guid)
+        public async Task<Producto> GetOne(int idProducto)
         {
-            return await base.GetOne(guid);
+            var query = "SELECT [IdProducto], [Nombre], [Provincia], [Localidad] FROM [dbo].[Producto] WHERE [IdProducto] = @IdProducto";
+            return await QuerySingle<Producto>(query, new { idProducto });
         }
 
-        public async Task Delete(Guid guid)
-        {
-            await base.Delete(guid);
-        }
+        #endregion
+
     }
 }
 

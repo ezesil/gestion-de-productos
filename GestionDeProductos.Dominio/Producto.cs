@@ -7,8 +7,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GestionDeProductos.Domain
 {
-    public class Producto : Entity
+    public class Producto
     {
+        public int IdProducto { get; set; }
         public string? Nombre { get; set; }
         public string? Descripcion { get; set; }
         public double Precio { get; set; }

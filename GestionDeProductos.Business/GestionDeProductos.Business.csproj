@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="2.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GestionDeProductos.DataAccess\GestionDeProductos.DataAccess.csproj" />
+    <ProjectReference Include="..\GestionDeProductos.Dominio\GestionDeProductos.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -8,6 +8,7 @@ namespace GestionDeProductos.Domain
 {
     public class Operacion
     {
+        public int IdOperacion {  get; set; }
         public string? Origen { get; set; }
         public string? Destino { get; set; }
         public DateTime? Fecha { get; set; }

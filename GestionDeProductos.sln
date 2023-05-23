@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionDeProductos.Business
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionDeProductos.DataAccess", "GestionDeProductos.DataAccess\GestionDeProductos.DataAccess.csproj", "{7E8039F8-5A64-4C5E-BD36-A9CB315CF875}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestionDeProductos.Tools", "GestionDeProductos.Tools\GestionDeProductos.Tools.csproj", "{2853B3E6-18E8-4E40-B422-886528E970CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{7E8039F8-5A64-4C5E-BD36-A9CB315CF875}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E8039F8-5A64-4C5E-BD36-A9CB315CF875}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E8039F8-5A64-4C5E-BD36-A9CB315CF875}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2853B3E6-18E8-4E40-B422-886528E970CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2853B3E6-18E8-4E40-B422-886528E970CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2853B3E6-18E8-4E40-B422-886528E970CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2853B3E6-18E8-4E40-B422-886528E970CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

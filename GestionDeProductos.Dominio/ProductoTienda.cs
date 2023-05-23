@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace GestionDeProductos.Domain
 {
-    public abstract class Entity
+    public class ProductoTienda
     {
-        public int Id { get; set; }
+        public int IdTienda { get; set; }
+        public int IdProducto { get; set; }
+        public int Cantidad { get; set; }
     }
 }

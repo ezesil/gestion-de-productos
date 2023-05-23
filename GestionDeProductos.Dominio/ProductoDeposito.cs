@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace GestionDeProductos.Domain
 {
-    public class Deposito
+    public class ProductoDeposito
     {
         public int IdDeposito { get; set; }
-        public string? Nombre { get; set; }
-        public string? Provincia { get; set; }
-        public string? Localidad { get; set; }
+        public int IdProducto { get; set; }
+        public int Cantidad { get; set; }
     }
 }
