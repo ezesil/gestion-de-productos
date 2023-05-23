@@ -20,7 +20,12 @@ namespace GestionDeProductos.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-
+            builder.Services.AddCors(options =>
+                options.AddPolicy("Policy_Name", builder =>
+              builder.WithOrigins("https://*:7052/")
+                .SetIsOriginAllowedToAllowWildcardSubdomains()
+                .AllowAnyOrigin())
+            );
 
             builder.Services.AddSingleton<IGenericRepository<Producto>, ProductoRepository>();
             builder.Services.AddSingleton<IGenericRepository<Operacion>, OperacionRepository>();
@@ -52,6 +57,7 @@ namespace GestionDeProductos.Api
                 app.UseSwaggerUI();
             }
 
+            app.UseCors("Policy_Name");
 
             app.UseHttpsRedirection();
 

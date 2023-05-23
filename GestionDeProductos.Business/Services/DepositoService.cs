@@ -13,10 +13,12 @@ namespace GestionDeProductos.Business.Services
     public class DepositoService : IDepositoService
     {
         IUnitOfWork _uow { get; }
+        IGenericService<Operacion> _operacionService { get; }
 
-        public DepositoService(IUnitOfWork uow)
+        public DepositoService(IUnitOfWork uow, IGenericService<Operacion> operacionService)
         {
             _uow = uow;
+            _operacionService = operacionService;
         }
 
         public async Task Insert(Deposito obj)
@@ -89,6 +91,8 @@ namespace GestionDeProductos.Business.Services
             if (product.IdDeposito == IdDeposito)
                 return;
 
+            bool success = false;
+
             using (var scope = new TransactionScope())
             {
                 try
@@ -122,64 +126,85 @@ namespace GestionDeProductos.Business.Services
                         _uow.Deposito.UpdateDepositoProduct(destinationProduct).Wait();
                     }
 
+
                     scope.Complete();
+                    success = true;
                 }
                 catch (Exception ex)
                 {
                     throw;
                 }
             }
+
+            if (success)
+            {
+                _uow.Operacion.Insert(new Operacion()
+                {
+                    Origen = product.IdProducto,
+                    Destino = IdDeposito,
+                    Fecha = DateTime.Now,
+                    Usuario = "",
+                    EsDeposito = true,
+                });
+            }
         }
 
         public void TransferProductoATienda(ProductoDeposito product, int idTienda, int cantidad)
         {
-            try
+            bool success = false;
+            using (var scope = new TransactionScope())
             {
-
-                using (var scope = new TransactionScope())
+                try
                 {
-                    try
+                    var currentProduct = _uow.Deposito.GetDepositoProduct(product.IdDeposito, product.IdProducto).Result;
+                    var destinationProduct = _uow.Tienda.GetTiendaProduct(idTienda, product.IdProducto).Result;
+
+                    if (currentProduct == null || currentProduct.Cantidad < cantidad)
+                        throw new Exception("No hay suficiente stock para transferir.");
+
+
+                    // Tiene suficiente stock para transferir, modificamos y seguimos
+                    currentProduct.Cantidad -= cantidad;
+                    // Actualizamos
+                    _uow.Deposito.UpdateDepositoProduct(currentProduct).Wait();
+
+
+                    if (destinationProduct == null)
                     {
-                        var currentProduct = _uow.Deposito.GetDepositoProduct(product.IdDeposito, product.IdProducto).Result;
-                        var destinationProduct = _uow.Tienda.GetTiendaProduct(idTienda, product.IdProducto).Result;
-
-                        if (currentProduct == null || currentProduct.Cantidad < cantidad)
-                            throw new Exception("No hay suficiente stock para transferir.");
-
-
-                        // Tiene suficiente stock para transferir, modificamos y seguimos
-                        currentProduct.Cantidad -= cantidad;
-                        // Actualizamos
-                        _uow.Deposito.UpdateDepositoProduct(currentProduct).Wait();
-
-
-                        if (destinationProduct == null)
-                        {
-                            destinationProduct = new ProductoTienda();
-                            destinationProduct.IdTienda = idTienda;
-                            destinationProduct.IdProducto = product.IdProducto;
-                            destinationProduct.Cantidad += cantidad;
-                            _uow.Tienda.InsertTiendaProduct(destinationProduct).Wait();
-                        }
-                        else
-                        {
-                            destinationProduct.IdTienda = idTienda;
-                            destinationProduct.IdProducto = product.IdProducto;
-                            destinationProduct.Cantidad += cantidad;
-                            _uow.Tienda.UpdateTiendaProduct(destinationProduct).Wait();
-                        }
-
-                        scope.Complete();
+                        destinationProduct = new ProductoTienda();
+                        destinationProduct.IdTienda = idTienda;
+                        destinationProduct.IdProducto = product.IdProducto;
+                        destinationProduct.Cantidad += cantidad;
+                        _uow.Tienda.InsertTiendaProduct(destinationProduct).Wait();
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        throw;
+                        destinationProduct.IdTienda = idTienda;
+                        destinationProduct.IdProducto = product.IdProducto;
+                        destinationProduct.Cantidad += cantidad;
+                        _uow.Tienda.UpdateTiendaProduct(destinationProduct).Wait();
                     }
+
+                    scope.Complete();
+
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+                    throw;
                 }
             }
-            catch (Exception ex)
+
+            if (success)
             {
-                throw;
+                _uow.Operacion.Insert(new Operacion()
+                {
+                    Origen = product.IdProducto,
+                    Destino = idTienda,
+                    Fecha = DateTime.Now,
+                    Usuario = "",
+                    EsDeposito = false,
+                });
             }
         }
     }

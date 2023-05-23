@@ -23,25 +23,25 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
         #region Operacion
         public async Task Insert(Operacion obj)
         {
-            var query = "INSERT INTO [dbo].[Operacion] ([IdOperacion], [Origen], [Destino], [Fecha], [Usuario]) VALUES (@IdOperacion, @Origen, @Destino, @Fecha, @Usuario)";
+            var query = "INSERT INTO [dbo].[Operacion] ([IdOperacion], [Origen], [Destino], [EsDeposito], [Fecha], [Usuario]) VALUES (@IdOperacion, @Origen, @Destino, @EsDeposito, @Fecha, @Usuario)";
             await Query(query, obj);
         }
 
         public async Task Update(Operacion obj)
         {
-            var query = "UPDATE [dbo].[Operacion] SET [Origen] = @Origen, [Destino] = @Destino, [Fecha] = @Fecha, [Usuario] = @Usuario WHERE [IdOperacion] = @IdOperacion";
+            var query = "UPDATE [dbo].[Operacion] SET [Origen] = @Origen, [Destino] = @Destino, [EsDeposito] = @EsDeposito, [Fecha] = @Fecha, [Usuario] = @Usuario WHERE [IdOperacion] = @IdOperacion";
             await Query(query, obj);
         }
 
         public async Task<IEnumerable<Operacion>> GetAll()
         {
-            var query = "SELECT [IdOperacion], [Origen], [Destino], [Fecha], [Usuario] FROM [dbo].[Operacion]";
+            var query = "SELECT [IdOperacion], [Origen], [Destino], [EsDeposito], [Fecha], [Usuario] FROM [dbo].[Operacion]";
             return await QueryMultiple<Operacion>(query);
         }
 
         public async Task<Operacion> GetOne(int idOperacion)
         {
-            var query = "SELECT [IdOperacion], [Origen], [Destino], [Fecha], [Usuario] FROM [dbo].[Operacion] WHERE [IdOperacion] = @IdOperacion";
+            var query = "SELECT [IdOperacion], [Origen], [Destino], [EsDeposito], [Fecha], [Usuario] FROM [dbo].[Operacion] WHERE [IdOperacion] = @IdOperacion";
             return await QuerySingle<Operacion>(query, new { idOperacion });
         }
 

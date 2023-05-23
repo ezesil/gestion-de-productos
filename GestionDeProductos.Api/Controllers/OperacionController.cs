@@ -33,7 +33,13 @@ namespace GestionDeProductos.Api.Controllers
         [Route("GetAllOperacions")]
         public async Task<IEnumerable<Operacion>> GetAllOperaciones()
         {
-            return await _service.GetAll();
+            var ops = await _service.GetAll();
+
+            if(ops == null)          
+                return Enumerable.Empty<Operacion>();
+
+            return ops;
+            
         }
 
         [HttpPost]

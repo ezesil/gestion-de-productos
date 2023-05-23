@@ -59,6 +59,21 @@ namespace GestionDeProductos.Api.Controllers
         }
 
         [HttpPost]
+        [Route("GetAllProductoDeposito")]
+        public async Task<IEnumerable<ProductoDeposito>> GetAllProductoDeposito(int id)
+        {
+            return await _service.GetAllDepositoProduct(id);
+        }
+
+
+        [HttpPost]
+        [Route("GetProductoDeposito")]
+        public async Task<ProductoDeposito> GetProductoDeposito(int idDeposito, int idProducto)
+        {
+            return await _service.GetDepositoProduct(idDeposito, idProducto);
+        }
+
+        [HttpPost]
         [Route("AgregarProducto")]
         public async Task AgregarProducto([FromBody] ProductoDeposito product)
         {

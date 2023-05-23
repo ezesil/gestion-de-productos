@@ -1,0 +1,53 @@
+﻿@page "/operaciones"
+@using GestionDeProductos;
+@using GestionDeProductos.Domain;
+@using Microsoft.AspNetCore.Authorization;
+@using Radzen.Blazor;
+@using Radzen;
+@using RestSharp;
+@using RestSharp.Authenticators;
+
+
+
+<AuthorizeView>
+    <Authorized>
+        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                        Data="@operaciones" TItem="Operacion" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+            <Columns>
+                <RadzenDataGridColumn TItem="Operacion" Property="IdOperacion" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn TItem="Operacion" Property="Origen" Title="Origen" Frozen="true" Width="160px" />
+                <RadzenDataGridColumn TItem="Operacion" Property="Destino" Title="Destino" Width="160px" />
+                <RadzenDataGridColumn TItem="Operacion" Property="EsDeposito" Title="EsDeposito" Width="200px" />
+                <RadzenDataGridColumn TItem="Operacion" Property="Fecha" Title="Fecha" Width="200px" />
+                <RadzenDataGridColumn TItem="Operacion" Property="Usuario" Title="Usuario" Width="200px" />
+            </Columns>
+        </RadzenDataGrid>
+    </Authorized>
+    <NotAuthorized>
+        No estas autorizado a ver esta pagina.
+    </NotAuthorized>
+</AuthorizeView>    
+
+
+@code {
+    IEnumerable<Operacion> operaciones;
+    RestClient _client;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var options = new RestClientOptions("https://localhost:7052");
+
+        _client = new RestClient(options);
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        var request = new RestRequest("Operacion/GetAllOperacions");
+
+        operaciones = await _client.GetAsync<IEnumerable<Operacion>>(request) ?? new List<Operacion>();
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

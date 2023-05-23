@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="swaggerjson\swagger.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
     <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
     <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
@@ -20,11 +24,30 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.5" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="7.0.2">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="NSwag.ApiDescription.Client" Version="13.18.2">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Radzen.Blazor" Version="4.11.2" />
+		<PackageReference Include="RestSharp" Version="110.2.0" />
 		<PackageReference Include="Serilog" Version="2.12.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\GestionDeProductos.Dominio\GestionDeProductos.Domain.csproj" />
 	</ItemGroup>
 
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="OpenAPIs\index.html" ClassName="GestionProductosAPI" />
   </ItemGroup>
 
 </Project>
