@@ -20,27 +20,27 @@ namespace GestionDeProductos.Business.Services
 
         public async Task Insert(Operacion obj)
         {
-            await _uow.Operacion.Insert(obj);
+            _uow.Operacion.Insert(obj);
         }
 
         public async Task Update(Operacion obj)
         {
-            await _uow.Operacion.Update(obj);
+            _uow.Operacion.Update(obj);
         }
 
         public async Task<IEnumerable<Operacion>> GetAll()
         {
-            return await _uow.Operacion.GetAll();
+            return _uow.Operacion.SelectAll();
         }
 
-        public async Task<Operacion> GetOne(int guid)
+        public async Task<Operacion> GetOne(int idOperacion)
         {
-            return await _uow.Operacion.GetOne(guid);
+            return _uow.Operacion.SelectOne(new { idOperacion });
         }
 
-        public async Task Delete(int guid)
+        public async Task Delete(int idOperacion)
         {
-            await _uow.Operacion.Delete(guid);
+            _uow.Operacion.Delete(new { idOperacion });
         }
     }
 }

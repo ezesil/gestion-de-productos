@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using System.Transactions;
 using Dapper;
-using GestionDeProductos.Domain;
-using Microsoft.Win32;
-using static Dapper.SqlMapper;
+using global::GestionDeProductos.Domain;
 
 namespace GestionDeProductos.DataAccess.Repository.Sql
 {
-    public abstract class SqlRepository1<T> : IRepository<T> where T : class
+    public abstract class SqlRepository2<T> : IRepository<T> where T : class
     {
         protected IDbConnection connection;
         protected IDbTransaction tran;
         protected string tableName;
 
-        protected SqlRepository1(IDbConnection connection)
+        protected SqlRepository2(IDbConnection connection)
         {
             this.connection = connection;
             tableName = GetTableName();
@@ -33,35 +29,7 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
             return typeof(T).Name;
         }
 
-        public T SelectOne(object whereParams)
-        {
-            var parameters = new Dictionary<string, object>();
-            var whereClause = BuildWhereClause(whereParams, parameters);
-
-            var query = $"SELECT {GenerateFieldList()} FROM {tableName}";
-            if (!string.IsNullOrEmpty(whereClause))
-            {
-                query += $" WHERE {whereClause}";
-            }
-
-            return connection.QueryFirstOrDefault<T>(query, parameters);
-        }
-
-        public T SelectOne(T whereParams)
-        {
-            var parameters = new Dictionary<string, object>();
-            var whereClause = BuildWhereClause(whereParams, parameters);
-
-            var query = $"SELECT {GenerateFieldList()} FROM {tableName}";
-            if (!string.IsNullOrEmpty(whereClause))
-            {
-                query += $" WHERE {whereClause}";
-            }
-
-            return connection.QueryFirstOrDefault<T>(query, parameters);
-        }
-
-        private string GenerateFieldList()
+        protected virtual string GenerateFieldList()
         {
             var fields = typeof(T).GetProperties()
                 .Where(p => Attribute.IsDefined(p, typeof(DbNameAttribute)))
@@ -71,7 +39,32 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
             return string.Join(", ", fields);
         }
 
-        private string BuildWhereClause(object whereParams, IDictionary<string, object> parameters)
+        protected virtual string GetColumnName(PropertyInfo property)
+        {
+            var attribute = property.GetCustomAttribute<DbNameAttribute>();
+            return attribute != null ? attribute.ColumnName : property.Name;
+        }
+
+        protected virtual Dictionary<string, object> GetParametersFromObject(T entity)
+        {
+            var parameters = new Dictionary<string, object>();
+
+            var properties = typeof(T).GetProperties();
+            foreach (var property in properties)
+            {
+                var attribute = property.GetCustomAttribute<DbNameAttribute>();
+                if (attribute != null)
+                {
+                    string columnName = attribute.ColumnName ?? property.Name;
+                    object value = property.GetValue(entity);
+                    parameters.Add(columnName, value);
+                }
+            }
+
+            return parameters;
+        }
+
+        protected virtual string BuildWhereClause(object whereParams, IDictionary<string, object> parameters)
         {
             if (whereParams == null)
                 return null;
@@ -113,10 +106,23 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
             return conditions.Count > 0 ? string.Join(" AND ", conditions) : null;
         }
 
-        private string GetColumnName(PropertyInfo property)
+        public T SelectOne(object whereParams)
         {
-            var attribute = property.GetCustomAttribute<DbNameAttribute>();
-            return attribute != null ? attribute.ColumnName : property.Name;
+            var parameters = new Dictionary<string, object>();
+            var whereClause = BuildWhereClause(whereParams, parameters);
+
+            var query = $"SELECT {GenerateFieldList()} FROM {tableName}";
+            if (!string.IsNullOrEmpty(whereClause))
+            {
+                query += $" WHERE {whereClause}";
+            }
+
+            return connection.QueryFirstOrDefault<T>(query, parameters);
+        }
+
+        public T SelectOne(T whereParams)
+        {
+            return SelectOne((object)whereParams);
         }
 
         public IEnumerable<T> SelectAll(object whereParams = null)
@@ -132,48 +138,29 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
 
             return connection.Query<T>(query, parameters);
         }
-        
 
         public virtual int Insert(T entity)
         {
             var parameters = GetParametersFromObject(entity);
-            string columns = string.Join(", ", parameters
+            var insertColumns = parameters
                 .Where(p => !Attribute.IsDefined(typeof(T).GetProperty(p.Key), typeof(DbNameAttribute)) || !((DbNameAttribute)Attribute.GetCustomAttribute(typeof(T).GetProperty(p.Key), typeof(DbNameAttribute))).IsId)
-                .Select(p => p.Key));
+                .Select(p => p.Key);
+            var insertValues = insertColumns.Select(p => $"@{p}");
 
-            string values = string.Join(", ", parameters
-                .Where(p => !Attribute.IsDefined(typeof(T).GetProperty(p.Key), typeof(DbNameAttribute)) || !((DbNameAttribute)Attribute.GetCustomAttribute(typeof(T).GetProperty(p.Key), typeof(DbNameAttribute))).IsId)
-                .Select(p => $"@{p.Key}"));
-
-            string query = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
-            return connection.Execute(query, parameters.ToDictionary(p => p.Key, p => p.Value), tran);
+            var query = $"INSERT INTO {tableName} ({string.Join(", ", insertColumns)}) VALUES ({string.Join(", ", insertValues)})";
+            return connection.Execute(query, parameters, tran);
         }
 
         public virtual int Update(T entity, object whereParams)
         {
             var parameters = GetParametersFromObject(entity);
 
-            string setStatements = string.Join(", ", parameters
-            .Where(p => !Attribute.IsDefined(typeof(T).GetProperty(p.Key), typeof(DbNameAttribute)) || !((DbNameAttribute)Attribute.GetCustomAttribute(typeof(T).GetProperty(p.Key), typeof(DbNameAttribute))).IsId)
-            .Select(p => $"{p.Key} = @{p.Key}"));
+            var setStatements = parameters
+                .Where(p => !Attribute.IsDefined(typeof(T).GetProperty(p.Key), typeof(DbNameAttribute)) || !((DbNameAttribute)Attribute.GetCustomAttribute(typeof(T).GetProperty(p.Key), typeof(DbNameAttribute))).IsId)
+                .Select(p => $"{p.Key} = @{p.Key}");
 
             var whereClause = BuildWhereClause(whereParams ?? entity, parameters);
-            string query = $"UPDATE {tableName} SET {setStatements}";
-
-            if (!string.IsNullOrEmpty(whereClause))
-            {
-                query += $" WHERE {whereClause}";
-            }
-
-            return connection.Execute(query, parameters.ToDictionary(p => p.Key, p => p.Value), tran);
-        }
-
-        public virtual int Delete(object whereParams)
-        {
-            var parameters = new Dictionary<string, object>();
-            var whereClause = BuildWhereClause(whereParams, parameters);
-
-            string query = $"DELETE FROM {tableName}";
+            var query = $"UPDATE {tableName} SET {string.Join(", ", setStatements)}";
 
             if (!string.IsNullOrEmpty(whereClause))
             {
@@ -183,23 +170,19 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
             return connection.Execute(query, parameters, tran);
         }
 
-        private Dictionary<string, object> GetParametersFromObject(T entity)
+        public virtual int Delete(object whereParams)
         {
             var parameters = new Dictionary<string, object>();
+            var whereClause = BuildWhereClause(whereParams, parameters);
 
-            var properties = typeof(T).GetProperties();
-            foreach (var property in properties)
+            var query = $"DELETE FROM {tableName}";
+
+            if (!string.IsNullOrEmpty(whereClause))
             {
-                var attribute = property.GetCustomAttribute<DbNameAttribute>();
-                if (attribute != null)
-                {
-                    string columnName = attribute.ColumnName ?? property.Name;
-                    object value = property.GetValue(entity);
-                    parameters.Add(columnName, value);
-                }
+                query += $" WHERE {whereClause}";
             }
 
-            return parameters;
+            return connection.Execute(query, parameters, tran);
         }
 
         public virtual void Open()
@@ -228,3 +211,5 @@ namespace GestionDeProductos.DataAccess.Repository.Sql
         }
     }
 }
+
+

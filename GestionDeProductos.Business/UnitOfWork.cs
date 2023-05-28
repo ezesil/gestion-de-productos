@@ -16,21 +16,31 @@ namespace GestionDeProductos.Business.Uow
     /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
-        public IGenericRepository<Producto> Producto { get; }
-        public IGenericRepository<Operacion> Operacion { get; }
-        public IDepositoRepository Deposito { get; }
-        public ITiendaRepository Tienda { get; }
+        public IRepository<Producto> Producto { get; }
+        public IRepository<Operacion> Operacion { get; }
+        public IRepository<Deposito> Deposito { get; }
+        public IRepository<Tienda> Tienda { get; }
+        public IRepository<ProductoDeposito> ProductoDeposito { get; }
+        public IRepository<ProductoTienda> ProductoTienda { get; }
+        public IRepository<Log> Log { get; }
+
 
         public UnitOfWork(
-            IGenericRepository<Producto> productoRepository, 
-            IGenericRepository<Operacion> operacionRepository,
-            IDepositoRepository depositoRepository,
-            ITiendaRepository tiendaRepository)
+            IRepository<Producto> productoRepository,
+            IRepository<Operacion> operacionRepository,
+            IRepository<Deposito> depositoRepository,
+            IRepository<Tienda> tiendaRepository,
+            IRepository<ProductoDeposito> productoDeposito,
+            IRepository<ProductoTienda> productoTienda,
+            IRepository<Log> log)
         {
             Producto = productoRepository;
             Operacion = operacionRepository;
             Deposito = depositoRepository;
             Tienda = tiendaRepository;
+            ProductoDeposito = productoDeposito;
+            ProductoTienda = productoTienda;
+            Log = log;          
         }
 
     }

@@ -11,6 +11,7 @@
 
 <AuthorizeView>
     <Authorized>
+        <button @onclick="Get">Actualizar</button>
         <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                         Data="@operaciones" TItem="Operacion" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
             <Columns>
@@ -49,5 +50,16 @@
         operaciones = await _client.GetAsync<IEnumerable<Operacion>>(request) ?? new List<Operacion>();
 
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async Task Get()
+    {
+        var options = new RestClientOptions("https://localhost:7052");
+
+        _client = new RestClient(options);
+
+         var request = new RestRequest("Operacion/GetAllOperacions");
+
+        operaciones = await _client.GetAsync<IEnumerable<Operacion>>(request) ?? new List<Operacion>();
     }
 }

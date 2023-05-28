@@ -21,27 +21,37 @@ namespace GestionDeProductos.Business.Services
 
         public async Task Insert(Producto obj)
         {
-            await _uow.Producto.Insert(obj);
+            _uow.Producto.Open();
+            _uow.Producto.Insert(obj);
+            _uow.Producto.Commit();
         }
 
         public async Task Update(Producto obj)
         {
-            await _uow.Producto.Update(obj);
+            _uow.Producto.Open();
+            _uow.Producto.Update(obj);
+            _uow.Producto.Commit();
         }
 
         public async Task<IEnumerable<Producto>> GetAll()
         {
-            return await _uow.Producto.GetAll();
+            _uow.Producto.Open();
+            var result = _uow.Producto.SelectAll();
+            return result;
         }
 
         public async Task<Producto> GetOne(int guid)
         {
-            return await _uow.Producto.GetOne(guid);
+            _uow.Producto.Open();
+            var result = _uow.Producto.SelectOne(guid);
+            return result;
         }
 
         public async Task Delete(int guid)
         {
-            await _uow.Producto.Delete(guid);
+            _uow.Producto.Open();
+            _uow.Producto.Delete(guid);
+            _uow.Producto.Commit();
         }
     }
 }

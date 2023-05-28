@@ -20,52 +20,52 @@ namespace GestionDeProductos.Business.Services
 
         public async Task Insert(Tienda obj)
         {
-            await _uow.Tienda.Insert(obj);
+            _uow.Tienda.Insert(obj);
         }
 
         public async Task Update(Tienda obj)
         {
-            await _uow.Tienda.Update(obj);
+            _uow.Tienda.Update(obj);
         }
 
         public async Task<IEnumerable<Tienda>> GetAll()
         {
-            return await _uow.Tienda.GetAll();
+            return _uow.Tienda.SelectAll();
         }
 
-        public async Task<Tienda> GetOne(int guid)
+        public async Task<Tienda> GetOne(int idTienda)
         {
-            return await _uow.Tienda.GetOne(guid);
+            return _uow.Tienda.SelectOne(new { idTienda });
         }
 
-        public async Task Delete(int guid)
+        public async Task Delete(int idTienda)
         {
-            await _uow.Tienda.Delete(guid);
+            _uow.Tienda.Delete(new { idTienda });
         }
 
         public async Task<ProductoTienda> GetTiendaProduct(int idTienda, int idProducto)
         {
-            return await _uow.Tienda.GetTiendaProduct(idTienda, idProducto);
+            return _uow.ProductoTienda.SelectOne(new { idTienda, idProducto });
         }
 
         public async Task<IEnumerable<ProductoTienda>> GetAllTiendaProduct(int idTienda)
         {
-            return await _uow.Tienda.GetAllTiendaProduct(idTienda);
+            return _uow.ProductoTienda.SelectAll(new { idTienda });
         }
 
         public async Task InsertTiendaProduct(ProductoTienda product)
         {
-            await _uow.Tienda.InsertTiendaProduct(product);
+            _uow.ProductoTienda.Insert(product);
         }
 
         public async Task UpdateTiendaProduct(ProductoTienda product)
         {
-            await _uow.Tienda.UpdateTiendaProduct(product);
+            _uow.ProductoTienda.Update(product);
         }
 
         public async Task DeleteTiendaProduct(int idTienda, int idProducto)
         {
-            await _uow.Tienda.DeleteTiendaProduct(idTienda, idProducto);
+            _uow.ProductoTienda.Delete(new { idTienda, idProducto });
         }
     }
 }

@@ -1,4 +1,7 @@
 using System;
+using System.Data;
+using System.Data.SqlClient;
+using Dapper;
 using GestionDeProductos.Business.Interfaces;
 using GestionDeProductos.Business.Services;
 using GestionDeProductos.Business.Uow;
@@ -27,12 +30,21 @@ namespace GestionDeProductos.Api
                 .AllowAnyOrigin())
             );
 
-            builder.Services.AddSingleton<IGenericRepository<Producto>, ProductoRepository>();
-            builder.Services.AddSingleton<IGenericRepository<Operacion>, OperacionRepository>();
-            builder.Services.AddSingleton<IDepositoRepository, DepositoRepository>();
-            builder.Services.AddSingleton<ITiendaRepository, TiendaRepository>();
+            WarmupDbConn();
 
-            builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IDbConnection>(x => new SqlConnection(Environment.GetEnvironmentVariable("mssql_connstring")));
+         
+            builder.Services.AddScoped<IRepository<Log>, LogRepository>();
+            builder.Services.AddScoped<ILogService, LogService>();
+
+            builder.Services.AddScoped<IRepository<Producto>, ProductRepository>();
+            builder.Services.AddScoped<IRepository<Deposito>, DepositoRepository>();
+            builder.Services.AddScoped<IRepository<ProductoTienda>, ProductoXTiendaRepository>();
+            builder.Services.AddScoped<IRepository<ProductoDeposito>, ProductoXDepositoRepository>();
+            builder.Services.AddScoped<IRepository<Operacion>, OperacionRepository>();
+            builder.Services.AddScoped<IRepository<Tienda>, TiendaRepository>();
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddScoped<IGenericService<Producto>, ProductoService>();
             builder.Services.AddScoped<IGenericService<Operacion>, OperacionService>();
@@ -63,10 +75,24 @@ namespace GestionDeProductos.Api
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
-            app.Run();
+            app.Run();                   
+        }
+
+        static void WarmupDbConn()
+        {
+            string connectionString = Environment.GetEnvironmentVariable("mssql_connstring");
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = "SELECT @@version";
+                string version = connection.ExecuteScalar<string>(sql);
+
+                Console.WriteLine($"SQL Server version {version} conectado.");
+            }
         }
     }
 }

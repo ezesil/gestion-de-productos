@@ -1,5 +1,4 @@
-﻿using GestionDeProductos.DataAccess.Interfaces;
-using GestionDeProductos.Domain;
+﻿using GestionDeProductos.Domain;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace GestionDeProductos.DataAccess.Repository.Sql
 {
-    public class DepositoRepository : SqlRepository<Deposito>
+    public class ProductRepository : SqlRepository<Producto>
     {
-        public DepositoRepository(IDbConnection connection) : base(connection)
+        public ProductRepository(IDbConnection connection) : base(connection)
         {
         }
     }
